@@ -11,10 +11,10 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); }
-button, textarea { font: inherit; }
+button, textarea, select { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: default; }
-button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .icon-bank { position: absolute; width: 0; height: 0; overflow: hidden; }
 .icon { width: 17px; height: 17px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
 .shell { width: min(1120px, calc(100% - 64px)); margin-inline: auto; }
@@ -79,6 +79,10 @@ h1 span { display: inline-block; max-width: 100%; }
 .lineup-head, .stage-footer { justify-content: space-between; gap: 13px; }
 .lineup-head h2 { margin: 0; font-size: 14px; letter-spacing: -.02em; }
 .lineup-head h2 span { margin-left: 6px; color: var(--muted); font-size: 11px; font-weight: 500; }
+.lineup-actions, .music-choice { display: flex; align-items: center; gap: 7px; }
+.music-choice { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.music-choice select { min-height: 31px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); font-size: 12px; }
+.music-choice select:disabled { opacity: .55; }
 .secondary { min-height: 31px; }
 .secondary .icon { width: 14px; height: 14px; }
 .cards { list-style: none; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; margin: 9px 0 0; padding: 0; }
@@ -122,6 +126,8 @@ h1 span { display: inline-block; max-width: 100%; }
   .display-top { top: 11px; }
   .display-bottom { bottom: 11px; }
   .lineup { padding: 8px 10px 0; }
+  .lineup-head { flex-wrap: wrap; column-gap: 8px; row-gap: 5px; }
+  .music-choice > span { display: none; }
   .card { min-height: 38px; padding: 4px 5px; gap: 1px; }
   .card-number { font-size: 9px; }
   .card-name { font-size: 11px; }

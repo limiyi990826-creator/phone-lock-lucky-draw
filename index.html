@@ -53,8 +53,8 @@
           <div id="signal-name" class="signal-name">等待开奖</div>
           <div id="signal-code" class="signal-code">READY TO DRAW</div>
         </div>
-        <img class="show-mascot show-mascot--left" src="chentuan-pop.png" alt="" aria-hidden="true" decoding="async">
-        <img class="show-mascot" src="chentuan-pop.png" alt="" aria-hidden="true" decoding="async">
+        <img class="show-mascot show-mascot--left" src="chentuan-sushi.png" alt="" aria-hidden="true" decoding="async">
+        <img class="show-mascot" src="chentuan-bow.png" alt="" aria-hidden="true" decoding="async">
         <p class="show-comfort">这一轮没抽到也没关系，宸团给你一个抱抱。</p>
         <div class="display-bottom" aria-hidden="true"><span>SPOTLIGHT SYSTEM</span><span id="signal-index">— / 10</span></div>
         <div class="show-progress" aria-hidden="true"><span></span></div>
@@ -63,7 +63,18 @@
       <div class="lineup">
         <div class="lineup-head">
           <h2>本轮名单 <span>10 位参与者</span></h2>
-          <button type="button" id="edit-roster" class="secondary"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg> 编辑名单</button>
+          <div class="lineup-actions">
+            <label class="music-choice">
+              <span>配乐</span>
+              <select id="music-track" aria-label="抽选配乐">
+                <option value="rotate">每轮换一首</option>
+                <option value="comic">综艺鼓点</option>
+                <option value="detective">侦探蹑步</option>
+                <option value="arcade">街机冲刺</option>
+              </select>
+            </label>
+            <button type="button" id="edit-roster" class="secondary"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg> 编辑名单</button>
+          </div>
         </div>
         <ol id="cards" class="cards" aria-label="本轮参与者"></ol>
       </div>
@@ -145,7 +156,7 @@
       <svg class="winner-spark winner-spark--right" viewBox="0 0 24 24"><use href="#i-star"/></svg>
       <span class="winner-spark winner-spark--dot"></span>
       <span class="winner-spark winner-spark--dash"></span>
-      <img class="winner-mascot" src="chentuan-pop.png" alt="" decoding="async">
+      <img class="winner-mascot" id="winner-mascot" src="chentuan-sushi.png" alt="" decoding="async">
     </div>
     <div class="winner-card">
       <h2 class="winner-title" id="winner-title"><svg class="icon" aria-hidden="true"><use href="#i-trophy"/></svg> 恭喜中奖</h2>

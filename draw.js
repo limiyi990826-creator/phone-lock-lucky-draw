@@ -10,10 +10,12 @@
   ];
   const storageKey = "lucky-card-stage.v1";
   const archive = window.DrawArchive;
+  const musicTracks = ["comic", "detective", "arcade"];
+  const mascotImages = ["chentuan-sushi.png", "chentuan-bow.png"];
   const formatNumber = (number) => String(number).padStart(2, "0");
   const sampleNames = Array.from({ length: seatCount }, (_, index) => `星宸 ${formatNumber(index + 1)}`);
   const legacySampleName = (seat) => `选手 ${formatNumber(seat + 1)}`;
-  const initialState = () => ({ round: 1, roster: [...sampleNames], results: [], music: true });
+  const initialState = () => ({ round: 1, roster: [...sampleNames], results: [], music: true, musicTrack: "rotate" });
   const get = (id) => document.getElementById(id);
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
   let state = load();
@@ -29,6 +31,7 @@
   const historyButton = get("open-history");
   const drawButton = get("draw-button");
   const soundButton = get("toggle-sound");
+  const musicTrackSelect = get("music-track");
   const screenButton = get("toggle-screen");
   const rosterDialog = get("roster-dialog");
   const historyDialog = get("history-dialog");
@@ -64,6 +67,7 @@
           saved.roster = [...sampleNames];
         }
         if (typeof saved.music !== "boolean") saved.music = true;
+        if (!musicTracks.includes(saved.musicTrack)) saved.musicTrack = "rotate";
         return saved;
       }
     } catch {
@@ -120,6 +124,8 @@
 
   function renderRound() {
     get("round-number").textContent = formatNumber(state.round);
+    musicTrackSelect.disabled = false;
+    renderMusicChoice();
     const cards = state.roster.map((name, index) => {
       const card = document.createElement("li");
       card.className = "card";
@@ -166,17 +172,20 @@
     drawButton.disabled = false;
     rosterButton.disabled = true;
     historyButton.disabled = false;
+    musicTrackSelect.disabled = false;
     get("draw-label").textContent = "进入下一轮";
 
     if (!reveal) return;
+    const musicOptions = { sound: state.music, track: trackForRound() };
     if (typeof winnerDialog?.showModal === "function") {
       const winnerName = get("winner-name");
       winnerName.textContent = result.name;
       get("winner-meta").textContent = details;
+      get("winner-mascot").src = mascotImages[(result.round - 1) % mascotImages.length];
       winnerDialog.showModal();
-      window.DrawEffects.celebrate(get("winner-confetti"), { sound: state.music, origin: winnerName });
+      window.DrawEffects.celebrate(get("winner-confetti"), { ...musicOptions, origin: winnerName });
     } else {
-      window.DrawEffects.celebrate(get("confetti"), { sound: state.music, origin: signalName });
+      window.DrawEffects.celebrate(get("confetti"), { ...musicOptions, origin: signalName });
     }
   }
 
@@ -235,8 +244,9 @@
     drawButton.disabled = true;
     rosterButton.disabled = true;
     historyButton.disabled = true;
+    musicTrackSelect.disabled = true;
     get("draw-label").textContent = "抽选中";
-    if (state.music) window.DrawEffects.beginDraw(drawDuration);
+    if (state.music) window.DrawEffects.beginDraw(drawDuration, 0, trackForRound());
 
     const seat = randomIndex(seatCount);
     const result = {
@@ -433,10 +443,26 @@
     soundButton.replaceChildren(icon(state.music ? "sound" : "muted"));
   }
 
+  function trackForRound() {
+    return state.musicTrack === "rotate" ? musicTracks[(state.round - 1) % musicTracks.length] : state.musicTrack;
+  }
+
+  function renderMusicChoice() {
+    musicTrackSelect.value = state.musicTrack;
+    const track = Array.from(musicTrackSelect.options).find((option) => option.value === trackForRound());
+    musicTrackSelect.title = `本轮配乐：${track.textContent}`;
+  }
+
+  musicTrackSelect.addEventListener("change", () => {
+    state.musicTrack = musicTrackSelect.value;
+    persist();
+    renderMusicChoice();
+  });
+
   soundButton.addEventListener("click", () => {
     state.music = !state.music;
     if (!state.music) window.DrawEffects.stopDraw();
-    else if (drawStartedAt !== null) window.DrawEffects.beginDraw(drawDuration, performance.now() - drawStartedAt);
+    else if (drawStartedAt !== null) window.DrawEffects.beginDraw(drawDuration, performance.now() - drawStartedAt, trackForRound());
     else window.DrawEffects.primeSound();
     persist();
     renderSound();
