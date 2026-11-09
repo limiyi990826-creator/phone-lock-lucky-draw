@@ -1,5 +1,6 @@
 .show-winner-badge,
 .show-mascot,
+.show-comfort,
 .show-progress {
   display: none;
 }
@@ -85,7 +86,10 @@
   --reveal-ink: #172637;
   --reveal-muted: #3b536c;
   --mascot-width: clamp(114px, 19vw, 222px);
-  --mascot-right: clamp(12px, 3.5vw, 46px);
+  grid-template-columns: var(--mascot-width) minmax(0, 1fr) var(--mascot-width);
+  grid-template-rows: minmax(auto, 1fr) auto;
+  column-gap: clamp(8px, 1.4vw, 18px);
+  padding-bottom: 35px;
   background-color: #fcf5e2;
   background-image:
     radial-gradient(ellipse at 100% 100%, #c2e4ff 0%, transparent 53%),
@@ -122,6 +126,8 @@
 
 .stage.is-won .display-target {
   z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
   width: min(100%, 720px);
   gap: 12px;
 }
@@ -167,11 +173,11 @@
 
 .stage.is-won .show-mascot {
   display: block;
-  position: absolute;
   z-index: 1;
-  right: var(--mascot-right);
-  bottom: 28px;
-  width: var(--mascot-width);
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: end;
+  width: 100%;
   height: clamp(112px, 29vh, 225px);
   object-fit: contain;
   object-position: center bottom;
@@ -179,6 +185,33 @@
   transform-origin: 50% 90%;
   filter: drop-shadow(0 10px 9px #28425e2e);
   animation: mascot-dash 1180ms cubic-bezier(.26,.56,.25,1) 180ms both;
+}
+
+.stage.is-won .show-mascot--left {
+  grid-column: 1;
+  scale: -1 1;
+  animation-delay: 240ms;
+}
+
+.stage.is-won .show-comfort {
+  display: block;
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 7px 14px;
+  border: 1px solid #967a6033;
+  border-radius: 16px;
+  background: #fff9ede0;
+  color: #665348;
+  font-size: clamp(12px, 1.4vw, 15px);
+  font-weight: 650;
+  line-height: 1.55;
+  text-align: center;
+  text-wrap: balance;
+  animation: reveal-copy 640ms cubic-bezier(.2,.75,.25,1) 300ms both;
 }
 
 @keyframes suspense-progress {
@@ -211,33 +244,29 @@
   100% { transform: translate3d(0, 0, 0) rotate(0); }
 }
 
-@media (min-width: 641px) {
-  .stage.is-won .display-target {
-    --mascot-space: calc(var(--mascot-width) + var(--mascot-right) - 8px);
-    width: min(calc(100% - var(--mascot-space) - var(--mascot-space)), 680px);
-  }
-}
-
 @media (max-width: 640px) {
   .stage.is-won .display {
+    --mascot-width: min(22%, 110px);
     min-height: 278px;
     padding: 36px 14px 29px;
-    gap: 3px;
+    gap: 6px;
   }
 
   .stage.is-won .display-target {
+    grid-column: 1 / -1;
     padding: 3px 4px;
     gap: 8px;
   }
 
   .stage.is-won .show-mascot {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    justify-self: end;
-    width: clamp(92px, 28vw, 126px);
-    height: clamp(88px, 25vw, 112px);
-    margin-right: 8px;
+    grid-row: 2;
+    align-self: center;
+    height: auto;
+    max-height: 102px;
+  }
+
+  .stage.is-won .show-comfort {
+    padding-inline: 8px;
   }
 }
 
@@ -248,6 +277,7 @@
   .stage.is-won .signal-name,
   .stage.is-won .signal-code,
   .stage.is-won .show-winner-badge,
+  .stage.is-won .show-comfort,
   .stage.is-won .show-mascot {
     animation: none;
   }

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="show.css">
   <link rel="stylesheet" href="winner-dialog.css">
   <script defer src="effects.js"></script>
+  <script defer src="archive.js"></script>
   <script defer src="draw.js"></script>
 </head>
 <body>
@@ -52,7 +53,9 @@
           <div id="signal-name" class="signal-name">等待开奖</div>
           <div id="signal-code" class="signal-code">READY TO DRAW</div>
         </div>
-        <img class="show-mascot" src="chentuan.png" alt="" aria-hidden="true" decoding="async">
+        <img class="show-mascot show-mascot--left" src="chentuan-pop.png" alt="" aria-hidden="true" decoding="async">
+        <img class="show-mascot" src="chentuan-pop.png" alt="" aria-hidden="true" decoding="async">
+        <p class="show-comfort">这一轮没抽到也没关系，宸团给你一个抱抱。</p>
         <div class="display-bottom" aria-hidden="true"><span>SPOTLIGHT SYSTEM</span><span id="signal-index">— / 10</span></div>
         <div class="show-progress" aria-hidden="true"><span></span></div>
       </div>
@@ -122,6 +125,18 @@
     </div>
     <ol id="history-list" class="draw-history"></ol>
   </div>
+  <section class="draw-history__storage" aria-labelledby="history-storage-title">
+    <h3 id="history-storage-title">保存与备份</h3>
+    <p>开奖记录保存在此浏览器，关闭后再打开仍可查看。换设备或清理浏览器数据前，请下载备份。</p>
+    <div class="draw-history__controls">
+      <button class="draw-dialog__button" id="history-export" type="button">导出 CSV</button>
+      <button class="draw-dialog__button" id="history-backup" type="button">下载备份</button>
+      <button class="draw-dialog__button" id="history-restore" type="button">恢复备份</button>
+      <button class="draw-dialog__button" id="history-autobackup" type="button">自动备份到文件</button>
+    </div>
+    <input id="history-file" type="file" accept=".json,application/json" hidden>
+    <p class="draw-history__storage-status" id="history-storage-status" role="status">自动文件备份未启用。</p>
+  </section>
 </dialog>
 <dialog class="winner-dialog" id="winner-dialog" aria-labelledby="winner-title" aria-describedby="winner-name winner-meta">
   <div class="winner-shell">

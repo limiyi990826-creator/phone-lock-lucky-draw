@@ -219,7 +219,17 @@
   gap: 8px;
   margin: 0;
   padding: 0;
+  max-height: min(36vh, 288px);
+  max-height: min(36dvh, 288px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #536174 var(--dialog-paper);
   list-style: none;
+}
+
+.draw-history:focus-visible {
+  outline: 2px solid var(--dialog-accent);
+  outline-offset: 3px;
 }
 
 .draw-history li {
@@ -245,6 +255,56 @@
   min-width: 0;
   overflow-wrap: anywhere;
   flex: 1;
+}
+
+.draw-history__storage {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dialog-line);
+}
+
+.draw-history__storage h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.draw-history__storage p {
+  margin: 7px 0 0;
+  color: var(--dialog-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.draw-history__controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.draw-dialog .draw-history__controls .draw-dialog__button {
+  padding: 7px 8px;
+  font-size: 13px;
+}
+
+.draw-dialog .draw-history__controls .draw-dialog__button:is(:hover:enabled, [aria-pressed="true"]) {
+  color: var(--dialog-accent);
+  background: #1a2532;
+  border-color: #5484b3;
+}
+
+.draw-dialog .draw-history__controls .draw-dialog__button:disabled:hover {
+  background: transparent;
+}
+
+.draw-history__storage .draw-history__storage-status {
+  margin-top: 10px;
+  min-height: 1.55em;
+}
+
+.draw-history__storage-status[data-tone="error"] {
+  color: #ffab9c;
 }
 
 @media (max-width: 420px) {

@@ -9,6 +9,7 @@
     { key: "slow", label: "即将锁定", caption: "即将锁定 / SLOWING DOWN", intervals: [130, 155, 190, 230, 280, 350, 445, 545, 720] },
   ];
   const storageKey = "lucky-card-stage.v1";
+  const archive = window.DrawArchive;
   const formatNumber = (number) => String(number).padStart(2, "0");
   const sampleNames = Array.from({ length: seatCount }, (_, index) => `星宸 ${formatNumber(index + 1)}`);
   const legacySampleName = (seat) => `选手 ${formatNumber(seat + 1)}`;
@@ -36,6 +37,19 @@
   const rosterCount = get("roster-count");
   const rosterError = get("roster-error");
   const saveRoster = get("save-roster");
+  const historyList = get("history-list");
+  const historyExport = get("history-export");
+  const historyBackup = get("history-backup");
+  const historyRestore = get("history-restore");
+  const historyFile = get("history-file");
+  const autoBackupButton = get("history-autobackup");
+  const historyStorageStatus = get("history-storage-status");
+  let backupStatus = "unbound";
+  const fileBackup = archive.createFileBackup({
+    getRecords: historyRecords,
+    mergeRecords: restoreRecords,
+    onStatus: renderBackupStatus,
+  });
 
   function load() {
     try {
@@ -44,13 +58,10 @@
           Array.isArray(saved.roster) && saved.roster.length === seatCount &&
           saved.roster.every((name) => typeof name === "string" && name.trim()) &&
           Array.isArray(saved.results)) {
-        if (saved.roster.every((name, seat) => name === legacySampleName(seat))) {
+        saved.results = archive.merge(saved.results);
+        if (saved.roster.every((name, seat) => name === legacySampleName(seat)) &&
+            !saved.results.some((result) => result.round === saved.round)) {
           saved.roster = [...sampleNames];
-          saved.results = saved.results.map((result) =>
-            result.name === legacySampleName(result.seat) && sampleNames[result.seat]
-              ? { ...result, name: sampleNames[result.seat] }
-              : result
-          );
         }
         if (typeof saved.music !== "boolean") saved.music = true;
         return saved;
@@ -62,11 +73,18 @@
   }
 
   function persist() {
+    state.results = historyRecords();
     try {
       localStorage.setItem(storageKey, JSON.stringify(state));
+      return true;
     } catch {
-      document.querySelector(".foot span:last-child").textContent = "名单与记录仅在此页面保留";
+      document.querySelector(".foot span:last-child").textContent = "浏览器保存不可用，请下载记录备份";
+      return false;
     }
+  }
+
+  function historyRecords() {
+    return archive.merge(state.results, load().results);
   }
 
   function icon(name, className = "icon") {
@@ -81,8 +99,9 @@
   }
 
   function currentResult() {
-    const last = state.results.at(-1);
-    return last?.round === state.round ? last : null;
+    return state.results.findLast((result) =>
+      result.round === state.round && result.name === state.roster[result.seat]
+    ) ?? null;
   }
 
   function setStatus(title, detail, symbol = "star") {
@@ -220,9 +239,16 @@
     if (state.music) window.DrawEffects.beginDraw(drawDuration);
 
     const seat = randomIndex(seatCount);
-    const result = { round: state.round, seat, name: state.roster[seat] };
+    const result = {
+      round: state.round,
+      seat,
+      name: state.roster[seat],
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+    };
     state.results.push(result);
     persist();
+    void fileBackup.sync();
 
     setStatus("抽选进行中", "本轮将在约 9 秒后揭晓。");
     await rollNames(drawStartedAt);
@@ -231,7 +257,8 @@
   }
 
   function advanceRound() {
-    state.round += 1;
+    state.round = nextRound(historyRecords());
+    if (state.roster.every((name, seat) => name === legacySampleName(seat))) state.roster = [...sampleNames];
     persist();
     renderRound();
   }
@@ -241,12 +268,15 @@
   }
 
   function updateRosterCount() {
-    const count = enteredNames().length;
+    const names = enteredNames();
+    const count = names.length;
+    const longName = names.some((name) => name.length > archive.maxNameLength);
     rosterCount.textContent = `${count} / ${seatCount}`;
-    rosterError.textContent = count > seatCount ? "本轮需要 10 位参与者，请删去多余的姓名。" : "";
-    rosterError.hidden = count <= seatCount;
-    namesInput.setAttribute("aria-invalid", String(count > seatCount));
-    saveRoster.disabled = count !== seatCount;
+    rosterError.textContent = longName ? "名单中有过长的姓名，请缩短后再保存。" :
+      count > seatCount ? "本轮需要 10 位参与者，请删去多余的姓名。" : "";
+    rosterError.hidden = !longName && count <= seatCount;
+    namesInput.setAttribute("aria-invalid", String(!rosterError.hidden));
+    saveRoster.disabled = count !== seatCount || longName;
   }
 
   rosterButton.addEventListener("click", () => {
@@ -264,15 +294,18 @@
   get("roster-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const names = enteredNames();
-    if (drawStartedAt !== null || currentResult() || names.length !== seatCount) return;
+    if (drawStartedAt !== null || currentResult() || names.length !== seatCount ||
+        names.some((name) => name.length > archive.maxNameLength)) return;
     state.roster = names;
     persist();
     renderRound();
     rosterDialog.close();
   });
 
-  historyButton.addEventListener("click", () => {
-    const rows = [...state.results].reverse().map((result) => {
+  function renderHistory() {
+    const records = historyRecords();
+    const rows = document.createDocumentFragment();
+    for (const result of records.reverse()) {
       const row = document.createElement("li");
       const round = document.createElement("span");
       round.className = "draw-history__round";
@@ -284,11 +317,103 @@
       seat.className = "draw-history__seat";
       seat.textContent = `${formatNumber(result.seat + 1)} 号`;
       row.append(round, winner, seat);
-      return row;
-    });
-    get("history-list").replaceChildren(...rows);
-    get("history-empty").hidden = rows.length > 0;
+      rows.append(row);
+    }
+    const hasRecords = records.length > 0;
+    historyList.replaceChildren(rows);
+    if (hasRecords) historyList.tabIndex = 0;
+    else historyList.removeAttribute("tabindex");
+    get("history-empty").hidden = hasRecords;
+    historyExport.disabled = !hasRecords;
+    historyBackup.disabled = !hasRecords;
+  }
+
+  function historyNotice(message, error = false) {
+    historyStorageStatus.textContent = message;
+    historyStorageStatus.dataset.tone = error ? "error" : "normal";
+  }
+
+  function renderBackupStatus(code, detail) {
+    backupStatus = code;
+    autoBackupButton.disabled = code === "unsupported" || code === "saving";
+    autoBackupButton.textContent = code === "permission-needed" ? "重新连接备份文件" :
+      code === "synced" ? "更换备份文件" : "自动备份到文件";
+    const messages = {
+      unsupported: "当前浏览器可手动下载和恢复备份。",
+      unbound: "自动文件备份未启用。",
+      "permission-needed": "浏览器需要重新授权，备份文件里的记录仍然保留。",
+      saving: "正在写入本地备份文件…",
+      synced: "已更新本地备份文件。每次开奖后会自动写入。",
+      error: detail || "备份文件写入失败，请重试。",
+    };
+    historyNotice(messages[code], code === "error");
+  }
+
+  function nextRound(records) {
+    const lastRound = Math.max(state.round, records.at(-1)?.round ?? 0);
+    if (lastRound < Number.MAX_SAFE_INTEGER) return lastRound + 1;
+    const usedRounds = new Set(records.map((record) => record.round));
+    let available = 1;
+    while (usedRounds.has(available)) available += 1;
+    return available;
+  }
+
+  function restoreRecords(records) {
+    const previous = historyRecords();
+    const finished = currentResult();
+    state.results = archive.merge(previous, records);
+    const latestRound = state.results.at(-1)?.round ?? 0;
+    if (drawStartedAt === null && (latestRound > state.round || (latestRound === state.round && !finished))) {
+      state.round = nextRound(state.results);
+      renderRound();
+    }
+    const saved = persist();
+    if (historyDialog.open) renderHistory();
+    return { added: state.results.length - previous.length, saved };
+  }
+
+  function datedFilename(label, extension) {
+    const date = new Date();
+    return `${label}-${date.getFullYear()}-${formatNumber(date.getMonth() + 1)}-${formatNumber(date.getDate())}.${extension}`;
+  }
+
+  historyButton.addEventListener("click", () => {
+    renderHistory();
     historyDialog.showModal();
+  });
+
+  historyExport.addEventListener("click", () => {
+    archive.download(datedFilename("中奖记录", "csv"), archive.csv(historyRecords()), "text/csv;charset=utf-8");
+  });
+  historyBackup.addEventListener("click", () => {
+    try {
+      archive.download(datedFilename("中奖记录备份", "json"), archive.serialize(historyRecords()), "application/json");
+    } catch (error) {
+      historyNotice(error.message, true);
+    }
+  });
+  historyRestore.addEventListener("click", () => historyFile.click());
+  historyFile.addEventListener("change", async () => {
+    const file = historyFile.files[0];
+    historyFile.value = "";
+    if (!file) return;
+    try {
+      if (file.size > archive.maxBackupBytes) throw new Error("此备份文件过大，无法读取。");
+      const records = archive.parse(await file.text());
+      const { added, saved } = restoreRecords(records);
+      const summary = added ? `已恢复 ${added} 条中奖记录。` : "备份中的记录已全部存在。";
+      historyNotice(saved ? summary : summary + " 浏览器保存不可用，请保留备份文件。", !saved);
+      void fileBackup.sync();
+    } catch (error) {
+      historyNotice(error.message || "无法恢复这份备份。", true);
+    }
+  });
+  autoBackupButton.addEventListener("click", () => {
+    if (backupStatus === "permission-needed") void fileBackup.reconnect();
+    else void fileBackup.bind();
+  });
+  window.addEventListener("storage", (event) => {
+    if (event.key === storageKey && historyDialog.open) renderHistory();
   });
 
   document.querySelectorAll("[data-close-dialog]").forEach((button) => {
@@ -336,4 +461,5 @@
   drawButton.addEventListener("click", draw);
   renderRound();
   renderSound();
+  void fileBackup.init();
 })();
