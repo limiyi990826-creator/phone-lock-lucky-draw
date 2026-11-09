@@ -1,0 +1,254 @@
+.show-winner-badge,
+.show-mascot,
+.show-progress {
+  display: none;
+}
+
+.stage.is-drawing {
+  --suspense-light: #5299e137;
+  --suspense-edge: #70bbff50;
+}
+
+.stage.is-drawing[data-phase="warmup"] {
+  --suspense-light: #5299e12c;
+}
+
+.stage.is-drawing[data-phase="rush"] {
+  --suspense-light: #5299e150;
+  --suspense-edge: #70bbff80;
+}
+
+.stage.is-drawing[data-phase="slow"] {
+  --suspense-light: #7ba8e454;
+  --suspense-edge: #b6ddffa0;
+}
+
+.stage.is-drawing[data-phase="hold"] {
+  --suspense-light: #e2c2844a;
+  --suspense-edge: #ffe5b6b0;
+}
+
+.stage.is-drawing .display::before {
+  background: radial-gradient(ellipse at center, var(--suspense-light), transparent 68%);
+  opacity: 1;
+}
+
+.stage.is-drawing .display::after {
+  border-color: var(--suspense-edge);
+}
+
+.stage.is-drawing .display-target .reticle {
+  color: var(--suspense-edge);
+}
+
+.stage.is-drawing[data-phase="slow"] .signal-code {
+  color: #d4e9ff;
+}
+
+.stage.is-drawing[data-phase="hold"] .signal-name {
+  color: #fff1d5;
+  animation: tension-hold 700ms ease-out both;
+}
+
+.stage.is-drawing[data-phase="hold"] .signal-code {
+  color: #ffe4b3;
+}
+
+.show-progress {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: #70bbff26;
+}
+
+.show-progress > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left;
+  background: linear-gradient(90deg, #488ad5, var(--accent) 68%, #ffe3b5);
+}
+
+.stage.is-drawing .show-progress {
+  display: block;
+}
+
+.stage.is-drawing .show-progress > span {
+  animation: suspense-progress var(--draw-duration, 9000ms) linear both;
+}
+
+.stage.is-won .display {
+  --reveal-ink: #172637;
+  --reveal-muted: #3b536c;
+  --mascot-width: clamp(114px, 19vw, 222px);
+  --mascot-right: clamp(12px, 3.5vw, 46px);
+  background-color: #fcf5e2;
+  background-image:
+    radial-gradient(ellipse at 100% 100%, #c2e4ff 0%, transparent 53%),
+    radial-gradient(ellipse at 2% 92%, #f5d6cb 0%, transparent 47%),
+    radial-gradient(ellipse at 54% 37%, #fffdf4 16%, transparent 69%);
+  background-size: auto;
+  border-bottom-color: #c4daec;
+  color: var(--reveal-ink);
+}
+
+.stage.is-won .display::before {
+  background:
+    repeating-radial-gradient(ellipse 52% 83% at 50% 109%, transparent 0 41px, #577ba31e 42px 43px),
+    radial-gradient(ellipse at 65% 105%, #e4effd7a, transparent 57%);
+  opacity: 1;
+}
+
+.stage.is-won .display::after {
+  z-index: 0;
+  border-color: #e2f3ff8a;
+  animation: reveal-edge 820ms ease-out both;
+}
+
+.stage.is-won .display-top,
+.stage.is-won .display-bottom {
+  z-index: 2;
+  color: var(--reveal-muted);
+}
+
+.stage.is-won .display-top b {
+  background: #2a649b;
+  box-shadow: none;
+}
+
+.stage.is-won .display-target {
+  z-index: 1;
+  width: min(100%, 720px);
+  gap: 12px;
+}
+
+.stage.is-won .reticle {
+  display: none;
+}
+
+.stage.is-won .show-winner-badge {
+  display: inline-flex;
+  justify-self: center;
+  align-items: center;
+  gap: 7px;
+  width: max-content;
+  max-width: 100%;
+  padding: 7px 13px;
+  border: 1px solid #1b3a5e20;
+  border-radius: 999px;
+  background: #b9deff;
+  color: #163657;
+  font-size: 12px;
+  font-weight: 790;
+  line-height: 1;
+  letter-spacing: .1em;
+  animation: reveal-copy 570ms cubic-bezier(.2,.75,.25,1) 80ms both;
+}
+
+.show-winner-badge .icon {
+  width: 12px;
+  height: 12px;
+  stroke: none;
+}
+
+.stage.is-won .signal-name {
+  color: var(--reveal-ink);
+  animation: reveal-copy 760ms cubic-bezier(.2,.75,.25,1) both;
+}
+
+.stage.is-won .signal-code {
+  color: var(--reveal-muted);
+  animation: reveal-copy 680ms cubic-bezier(.2,.75,.25,1) 150ms both;
+}
+
+.stage.is-won .show-mascot {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  right: var(--mascot-right);
+  bottom: 28px;
+  width: var(--mascot-width);
+  height: clamp(112px, 29vh, 225px);
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 10px 9px #28425e2e);
+  animation: mascot-dash 1180ms cubic-bezier(.26,.56,.25,1) 180ms both;
+}
+
+@keyframes suspense-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes tension-hold {
+  from { opacity: .66; transform: scale(.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes reveal-edge {
+  from { box-shadow: inset 0 0 60px #d6ebff80; }
+  to { box-shadow: inset 0 0 60px transparent; }
+}
+
+@keyframes reveal-copy {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes mascot-dash {
+  0%   { transform: translate3d(155%, 10px, 0) rotate(13deg); }
+  26%  { transform: translate3d(86%, -13px, 0) rotate(-8deg); }
+  44%  { transform: translate3d(53%, 1px, 0) rotate(6deg) scaleY(.97); }
+  61%  { transform: translate3d(18%, -14px, 0) rotate(-6deg); }
+  80%  { transform: translate3d(-4%, 1px, 0) rotate(4deg) scaleY(.96); }
+  91%  { transform: translate3d(0, -4px, 0) rotate(-2deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0); }
+}
+
+@media (min-width: 641px) {
+  .stage.is-won .display-target {
+    --mascot-space: calc(var(--mascot-width) + var(--mascot-right) - 8px);
+    width: min(calc(100% - var(--mascot-space) - var(--mascot-space)), 680px);
+  }
+}
+
+@media (max-width: 640px) {
+  .stage.is-won .display {
+    min-height: 278px;
+    padding: 36px 14px 29px;
+    gap: 3px;
+  }
+
+  .stage.is-won .display-target {
+    padding: 3px 4px;
+    gap: 8px;
+  }
+
+  .stage.is-won .show-mascot {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    justify-self: end;
+    width: clamp(92px, 28vw, 126px);
+    height: clamp(88px, 25vw, 112px);
+    margin-right: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage.is-drawing .show-progress > span,
+  .stage.is-drawing[data-phase="hold"] .signal-name,
+  .stage.is-won .display::after,
+  .stage.is-won .signal-name,
+  .stage.is-won .signal-code,
+  .stage.is-won .show-winner-badge,
+  .stage.is-won .show-mascot {
+    animation: none;
+  }
+}

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101111">
+  <meta name="description" content="现场抽奖工具。每轮十人，滚动点名并揭晓一位中奖者。">
+  <title>重生之手机锁来抽我</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dialogs.css">
+  <link rel="stylesheet" href="show.css">
+  <link rel="stylesheet" href="winner-dialog.css">
+  <script defer src="effects.js"></script>
+  <script defer src="draw.js"></script>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon-bank" aria-hidden="true">
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 0c.9 7.3 4.7 11.1 12 12-7.3.9-11.1 4.7-12 12C11.1 16.7 7.3 12.9 0 12 7.3 11.1 11.1 7.3 12 0Z" fill="currentColor"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M5 7V3m0 4h4m-4 0a8 8 0 1 1-1 9m8-8v5l3 2"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12"/></symbol>
+    <symbol id="i-muted" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm13 1 4 4m0-4-4 4"/></symbol>
+    <symbol id="i-screen" viewBox="0 0 24 24"><path d="M4 9V4h5m6 0h5v5m0 6v5h-5m-6 0H4v-5"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m14 6 4 4m-13 9 4-1L20 7l-4-4L5 14l-1 5Z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 3h10v5c0 4-2 7-5 7s-5-3-5-7V3ZM7 5H3v3c0 3 2 4 5 4m9-7h4v3c0 3-2 4-5 4m-4 3v5m-4 1h8"/></symbol>
+  </svg>
+  <header class="top">
+    <div class="shell top-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>重生之手机锁来抽我</span></div>
+      <div class="top-actions" aria-label="抽奖工具">
+        <button type="button" id="open-history" class="top-button"><svg class="icon" aria-hidden="true"><use href="#i-history"/></svg><span>中奖记录</span></button>
+        <button type="button" id="toggle-sound" class="top-button square" title="关闭音乐" aria-label="音乐" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg></button>
+        <button type="button" id="toggle-screen" class="top-button square" title="进入全屏" aria-label="全屏" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-screen"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow"><span aria-hidden="true"></span> 现场抽奖 <span class="eyebrow-divider" aria-hidden="true"></span> LIVE DRAW</div>
+        <h1 id="page-title"><span>重生之</span><wbr><span>手机锁来抽我</span></h1>
+      </div>
+      <div class="round" aria-label="当前轮次"><span>ROUND / 轮次</span><strong id="round-number">01</strong></div>
+    </section>
+
+    <section class="stage" id="stage" aria-label="开奖舞台">
+      <div class="display">
+        <div class="display-top" aria-hidden="true"><span><b></b><span id="signal-mode">待命</span></span><span>10 SEATS &nbsp; · &nbsp; 1 WINNER</span></div>
+        <div class="display-target" aria-hidden="true">
+          <span class="show-winner-badge"><svg class="icon"><use href="#i-star"/></svg> 本轮幸运得主</span>
+          <div class="reticle"><i></i><i></i><i></i><i></i></div>
+          <div id="signal-name" class="signal-name">等待开奖</div>
+          <div id="signal-code" class="signal-code">READY TO DRAW</div>
+        </div>
+        <img class="show-mascot" src="chentuan.png" alt="" aria-hidden="true" decoding="async">
+        <div class="display-bottom" aria-hidden="true"><span>SPOTLIGHT SYSTEM</span><span id="signal-index">— / 10</span></div>
+        <div class="show-progress" aria-hidden="true"><span></span></div>
+      </div>
+
+      <div class="lineup">
+        <div class="lineup-head">
+          <h2>本轮名单 <span>10 位参与者</span></h2>
+          <button type="button" id="edit-roster" class="secondary"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg> 编辑名单</button>
+        </div>
+        <ol id="cards" class="cards" aria-label="本轮参与者"></ol>
+      </div>
+
+      <div class="stage-footer">
+        <div id="status" class="status" role="status" aria-atomic="true">
+          <span id="status-symbol" class="status-symbol"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></span>
+          <div><strong id="status-title">准备就绪</strong><p id="status-detail">正在使用示例名单，可替换为现场名单。</p></div>
+        </div>
+        <button type="button" id="draw-button" class="primary">
+          <span id="draw-label">开始点名</span><svg class="icon trailing" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </button>
+      </div>
+    </section>
+    <footer class="foot"><span>每轮随机抽出 1 位</span><span>名单与记录保存在当前浏览器</span></footer>
+  </main>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+<dialog class="draw-dialog" id="roster-dialog" aria-labelledby="roster-dialog-title">
+  <header class="draw-dialog__header">
+    <div>
+      <p class="draw-dialog__eyebrow">参赛设置</p>
+      <h2 id="roster-dialog-title">编辑本轮名单</h2>
+    </div>
+    <button class="draw-dialog__close" type="button" data-close-dialog="roster-dialog" aria-label="关闭">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+  <form id="roster-form">
+    <p class="draw-dialog__intro" id="roster-hint">每轮共 10 位参与者。每行输入一个名字，支持直接粘贴名单。</p>
+    <div class="draw-dialog__field-header">
+      <label for="names-input">参与者名单</label>
+      <output id="roster-count" for="names-input">0 / 10</output>
+    </div>
+    <textarea id="names-input" rows="10" aria-describedby="roster-hint roster-error" placeholder="例如&#10;小林&#10;小陈" autofocus></textarea>
+    <p class="draw-dialog__error" id="roster-error" role="alert" hidden>请输入 10 位参与者的名字。</p>
+    <button class="draw-dialog__demo" id="demo-names" type="button">填入示例名单</button>
+    <footer class="draw-dialog__actions">
+      <button class="draw-dialog__button" type="button" data-close-dialog="roster-dialog">取消</button>
+      <button class="draw-dialog__button draw-dialog__button--primary" id="save-roster" type="submit">保存名单</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog class="draw-dialog" id="history-dialog" aria-labelledby="history-dialog-title">
+  <header class="draw-dialog__header">
+    <div>
+      <p class="draw-dialog__eyebrow">开奖记录</p>
+      <h2 id="history-dialog-title">历轮中奖名单</h2>
+    </div>
+    <button class="draw-dialog__close" type="button" data-close-dialog="history-dialog" aria-label="关闭" autofocus>
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+  <div class="draw-dialog__history">
+    <div class="draw-dialog__empty" id="history-empty">
+      <svg aria-hidden="true" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M16 3c1.7 8 5 11.3 13 13-8 1.7-11.3 5-13 13-1.7-8-5-11.3-13-13 8-1.7 11.3-5 13-13Z"/><path d="M25 3v6m-3-3h6M6 22v6m-3-3h6"/></svg>
+      <strong>还没有开奖</strong>
+      <p>完成第一轮抽奖后，中奖者会出现在这里。</p>
+    </div>
+    <ol id="history-list" class="draw-history"></ol>
+  </div>
+</dialog>
+<dialog class="winner-dialog" id="winner-dialog" aria-labelledby="winner-title" aria-describedby="winner-name winner-meta">
+  <div class="winner-shell">
+    <div class="winner-mascot-zone" aria-hidden="true">
+      <svg class="winner-spark winner-spark--left" viewBox="0 0 24 24"><use href="#i-star"/></svg>
+      <svg class="winner-spark winner-spark--right" viewBox="0 0 24 24"><use href="#i-star"/></svg>
+      <span class="winner-spark winner-spark--dot"></span>
+      <span class="winner-spark winner-spark--dash"></span>
+      <img class="winner-mascot" src="chentuan-pop.png" alt="" decoding="async">
+    </div>
+    <div class="winner-card">
+      <h2 class="winner-title" id="winner-title"><svg class="icon" aria-hidden="true"><use href="#i-trophy"/></svg> 恭喜中奖</h2>
+      <p class="winner-name" id="winner-name"></p>
+      <p class="winner-meta" id="winner-meta"></p>
+      <button class="winner-next" id="winner-next" type="button">下一轮 <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    </div>
+    <button class="winner-close" id="winner-close" type="button" data-close-dialog="winner-dialog" aria-label="关闭中奖弹窗" autofocus>
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <canvas id="winner-confetti" aria-hidden="true"></canvas>
+</dialog>
+</body>
+</html>
