@@ -13,7 +13,7 @@
   <script defer src="effects.js"></script>
   <script defer src="archive-batch.js"></script>
   <script defer src="roster.js"></script>
-  <script defer src="draw-start.js"></script>
+  <script defer src="draw-ready.js"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-bank" aria-hidden="true">
@@ -108,7 +108,7 @@
     </button>
   </header>
   <form id="roster-form">
-    <p class="draw-dialog__intro" id="roster-hint">每行一人，可带编号。按名单顺序每 10 人分一组，进入下一轮时自动切换到下一组。</p>
+    <p class="draw-dialog__intro" id="roster-hint">每行一人，可带编号。保存后自动按顺序每 10 人分一组，即可开始抽奖。</p>
     <p class="draw-dialog__intro" id="roster-edit-scope" hidden></p>
     <div class="draw-dialog__field-header">
       <label for="names-input">参与者名单</label>
@@ -193,7 +193,7 @@
       <p class="winner-name" id="winner-name"></p>
       <p class="winner-meta" id="winner-meta"></p>
       <ol class="multi-result-list winner-result-list" id="winner-multi-results" role="list" tabindex="0" aria-label="本次中奖名单" hidden></ol>
-      <button class="winner-next" id="winner-next" type="button"><span id="winner-next-label">下一轮</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <button class="winner-next" id="winner-next" type="button"><span id="winner-next-label">开始抽奖</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
       <button class="winner-edit-roster" id="winner-edit-roster" type="button">编辑名单</button>
     </div>
     <button class="winner-close" id="winner-close" type="button" data-close-dialog="winner-dialog" aria-label="关闭中奖弹窗" autofocus>
