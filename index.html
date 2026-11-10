@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="winner-dialog-edit.css">
   <script defer src="effects.js"></script>
   <script defer src="archive-batch.js"></script>
-  <script defer src="roster.js"></script>
-  <script defer src="draw-ready.js"></script>
+  <script defer src="roster-fair.js"></script>
+  <script defer src="draw-fair.js"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-bank" aria-hidden="true">
@@ -94,7 +94,7 @@
         </button>
       </div>
     </section>
-    <footer class="foot"><span>每轮随机抽出 1 位</span><span>名单与记录保存在当前浏览器</span></footer>
+    <footer class="foot"><span>每轮从未中奖者中随机抽出 1 位</span><span>名单与记录保存在当前浏览器</span></footer>
   </main>
   <canvas id="confetti" aria-hidden="true"></canvas>
 <dialog class="draw-dialog" id="roster-dialog" aria-labelledby="roster-dialog-title">
@@ -108,7 +108,7 @@
     </button>
   </header>
   <form id="roster-form">
-    <p class="draw-dialog__intro" id="roster-hint">每行一人，可带编号。保存后自动按顺序每 10 人分一组，即可开始抽奖。</p>
+    <p class="draw-dialog__intro" id="roster-hint">每行一人，按顺序每 10 人分一组，同组每人只录一次。系统按完整姓名排除已中奖者。同名不同人请加固定标识，例如「小宸（01）」和「小宸（02）」。</p>
     <p class="draw-dialog__intro" id="roster-edit-scope" hidden></p>
     <div class="draw-dialog__field-header">
       <label for="names-input">参与者名单</label>
