@@ -7,13 +7,13 @@
   <meta name="description" content="现场抽奖工具。每轮十人，滚动点名并揭晓一位中奖者。">
   <title>重生之手机锁来抽我</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="dialogs.css">
-  <link rel="stylesheet" href="show.css">
-  <link rel="stylesheet" href="winner-dialog.css">
+  <link rel="stylesheet" href="dialogs-batch.css">
+  <link rel="stylesheet" href="show-batch.css">
+  <link rel="stylesheet" href="winner-dialog-batch.css">
   <script defer src="effects.js"></script>
-  <script defer src="archive.js"></script>
+  <script defer src="archive-batch.js"></script>
   <script defer src="roster.js"></script>
-  <script defer src="draw-grouped.js"></script>
+  <script defer src="draw-batch.js"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-bank" aria-hidden="true">
@@ -54,6 +54,10 @@
           <div id="signal-name" class="signal-name">等待开奖</div>
           <div id="signal-code" class="signal-code">READY TO DRAW</div>
         </div>
+        <section class="multi-results" id="multi-results" aria-labelledby="multi-results-title">
+          <h2 id="multi-results-title"><svg class="icon" aria-hidden="true"><use href="#i-trophy"/></svg><span id="multi-results-label">中奖名单</span></h2>
+          <ol class="multi-result-list" id="multi-result-list" role="list" tabindex="0" aria-labelledby="multi-results-title"></ol>
+        </section>
         <img class="show-mascot show-mascot--left" src="chentuan-sushi.png" alt="" aria-hidden="true" decoding="async">
         <img class="show-mascot" src="chentuan-bow.png" alt="" aria-hidden="true" decoding="async">
         <p class="show-comfort">这一轮没抽到也没关系，宸团给你一个抱抱。</p>
@@ -86,7 +90,7 @@
           <div><strong id="status-title">准备就绪</strong><p id="status-detail">正在使用示例名单，可替换为现场名单。</p></div>
         </div>
         <button type="button" id="draw-button" class="primary">
-          <span id="draw-label">下一轮</span><svg class="icon trailing" aria-hidden="true"><use href="#i-arrow"/></svg>
+          <span id="draw-label">点击开始</span><svg class="icon trailing" aria-hidden="true"><use href="#i-arrow"/></svg>
         </button>
       </div>
     </section>
@@ -120,6 +124,29 @@
   </form>
 </dialog>
 
+<dialog class="draw-dialog" id="draw-mode-dialog" aria-labelledby="draw-mode-title" aria-describedby="draw-mode-hint">
+  <header class="draw-dialog__header">
+    <div>
+      <p class="draw-dialog__eyebrow">开奖设置</p>
+      <h2 id="draw-mode-title">选择抽奖方式</h2>
+    </div>
+    <button class="draw-dialog__close" type="button" data-close-dialog="draw-mode-dialog" aria-label="关闭">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+  <p class="draw-dialog__intro" id="draw-mode-hint">每组随机抽出 1 位中奖者。</p>
+  <div class="draw-mode__choices">
+    <button class="draw-mode__choice" id="draw-once" type="button" autofocus>
+      <span class="draw-mode__count" aria-hidden="true">01</span>
+      <span><strong>一组一次</strong><small>只抽接下来一组</small></span>
+    </button>
+    <button class="draw-mode__choice" id="draw-all" type="button" disabled>
+      <span class="draw-mode__count" id="draw-all-count" aria-hidden="true">—</span>
+      <span><strong id="draw-all-label">全部剩余组</strong><small>一次抽选，同时揭晓全部结果</small></span>
+    </button>
+  </div>
+</dialog>
+
 <dialog class="draw-dialog" id="history-dialog" aria-labelledby="history-dialog-title">
   <header class="draw-dialog__header">
     <div>
@@ -141,6 +168,7 @@
   <section class="draw-history__storage" aria-labelledby="history-storage-title">
     <h3 id="history-storage-title">保存与备份</h3>
     <p>开奖记录保存在此浏览器，关闭后再打开仍可查看。换设备或清理浏览器数据前，请下载备份。</p>
+    <p>CSV 每组一行，包含参与人、中奖人和开奖时间。旧记录未保存的名单会留空。</p>
     <div class="draw-history__controls">
       <button class="draw-dialog__button" id="history-export" type="button">导出 CSV</button>
       <button class="draw-dialog__button" id="history-backup" type="button">下载备份</button>
@@ -164,6 +192,7 @@
       <h2 class="winner-title" id="winner-title"><svg class="icon" aria-hidden="true"><use href="#i-trophy"/></svg> 恭喜中奖</h2>
       <p class="winner-name" id="winner-name"></p>
       <p class="winner-meta" id="winner-meta"></p>
+      <ol class="multi-result-list winner-result-list" id="winner-multi-results" role="list" tabindex="0" aria-label="本次中奖名单" hidden></ol>
       <button class="winner-next" id="winner-next" type="button"><span id="winner-next-label">下一轮</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
     </div>
     <button class="winner-close" id="winner-close" type="button" data-close-dialog="winner-dialog" aria-label="关闭中奖弹窗" autofocus>
