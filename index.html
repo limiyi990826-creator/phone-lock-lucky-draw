@@ -9,11 +9,11 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dialogs-batch.css">
   <link rel="stylesheet" href="show-batch.css">
-  <link rel="stylesheet" href="winner-dialog-batch.css">
+  <link rel="stylesheet" href="winner-dialog-edit.css">
   <script defer src="effects.js"></script>
   <script defer src="archive-batch.js"></script>
   <script defer src="roster.js"></script>
-  <script defer src="draw-batch.js"></script>
+  <script defer src="draw-edit.js"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-bank" aria-hidden="true">
@@ -114,7 +114,7 @@
       <label for="names-input">参与者名单</label>
       <output id="roster-count" for="names-input">0 人</output>
     </div>
-    <textarea id="names-input" rows="10" aria-describedby="roster-hint roster-error" placeholder="粘贴完整名单，例如&#10;1. 姓名甲&#10;2. 姓名乙" spellcheck="false" autofocus></textarea>
+    <textarea id="names-input" rows="10" aria-describedby="roster-hint roster-edit-scope roster-error" placeholder="粘贴完整名单，例如&#10;1. 姓名甲&#10;2. 姓名乙" spellcheck="false" autofocus></textarea>
     <p class="draw-dialog__error" id="roster-error" role="alert" hidden></p>
     <button class="draw-dialog__demo" id="demo-names" type="button">填入示例名单</button>
     <footer class="draw-dialog__actions">
@@ -194,6 +194,7 @@
       <p class="winner-meta" id="winner-meta"></p>
       <ol class="multi-result-list winner-result-list" id="winner-multi-results" role="list" tabindex="0" aria-label="本次中奖名单" hidden></ol>
       <button class="winner-next" id="winner-next" type="button"><span id="winner-next-label">下一轮</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <button class="winner-edit-roster" id="winner-edit-roster" type="button">编辑名单</button>
     </div>
     <button class="winner-close" id="winner-close" type="button" data-close-dialog="winner-dialog" aria-label="关闭中奖弹窗" autofocus>
       <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
